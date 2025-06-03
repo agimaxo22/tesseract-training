@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OCR Web App</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin: 40px; }
+    input { margin: 20px; }
+    #output { white-space: pre-wrap; margin-top: 20px; padding: 1em; background: #f3f3f3; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h1>🧠 OCR File Uploader</h1>
+  <input type="file" accept="image/*" onchange="runOCR(this)">
+  <div id="output">📋 Extracted text will appear here...</div>
+
+  <script>
+    function runOCR(input) {
+      const file = input.files[0];
+      const output = document.getElementById('output');
+      if (!file) return;
+
+      output.innerText = '🔍 Recognizing text...';
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        Tesseract.recognize(reader.result, 'eng', {
+          logger: m => console.log(m)
+        }).then(({ data: { text } }) => {
+          output.innerText = text;
+        }).catch(err => {
+          output.innerText = '❌ Error: ' + err.message;
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
